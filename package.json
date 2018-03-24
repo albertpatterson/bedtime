@@ -18,10 +18,10 @@
   },
   "homepage": "https://github.com/albertpatterson/bedtime#readme",
   "devDependencies": {
+    "browserify": "^16.1.1",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-rename": "^1.2.2",
+    "vinyl-source-stream": "^2.0.0",
     "webpack": "^4.2.0",
     "webpack-stream": "^4.0.3"
   },

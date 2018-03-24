@@ -1,9 +1,9 @@
 const gulp = require('gulp');
-const concat = require('gulp-concat');
 const del = require('del');
 const webpack = require('webpack');
 const webpackStream = require('webpack-stream');
-const rename = require('gulp-rename');
+const browserify = require('browserify');
+const source = require('vinyl-source-stream')
 
 const webpackStreamCurrent = (cPath)=>webpackStream(require(cPath), webpack);
 
@@ -15,9 +15,10 @@ gulp.task('clean', function(){
 })
 
 gulp.task('background', ['clean'] ,function(){
-    gulp.src('src/background/index.js')
-    .pipe(rename('background.js'))
-    .pipe(gulp.dest("dist/unpacked/background"))
+    return browserify("src/background/index.js")
+            .bundle()
+            .pipe(source('background.js'))
+            .pipe(gulp.dest("dist/unpacked/background"));
 })
 
 gulp.task('content', ['clean'] ,function(){
