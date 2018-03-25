@@ -1,10 +1,10 @@
 const path = require("path");
 
 module.exports = {
-    entry: './src/content/index.js',
+    entry: './src/injected/script/index.js',
     mode: 'development',
     output: {
       filename: 'content.js',
-      path: path.resolve(__dirname, '../../dist/unpacked/content')
+      path: path.resolve(__dirname, '../../dist/unpacked/injected/script')
     }
   };

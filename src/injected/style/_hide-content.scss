@@ -1,0 +1,12 @@
+body.bedtime *{
+    display: none;
+    
+    #bedtime-notice{
+        display: block;
+    }
+}
+
+#bedtime-notice{
+    display: none;
+    text-align: center;
+}

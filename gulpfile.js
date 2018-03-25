@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const webpackStream = require('webpack-stream');
 const browserify = require('browserify');
 const source = require('vinyl-source-stream')
+const sass = require('gulp-sass')
 
 const webpackStreamCurrent = (cPath)=>webpackStream(require(cPath), webpack);
 
@@ -21,11 +22,16 @@ gulp.task('background', ['clean'] ,function(){
             .pipe(gulp.dest("dist/unpacked/background"));
 })
 
-gulp.task('content', ['clean'] ,function(){
-    return gulp.src("src/content/index.js")
-    .pipe(webpackStreamCurrent("./src/content/webpack.conf.js"))
-    .pipe(gulp.dest("./dist/unpacked/content"));
+gulp.task('injected-script', ['clean'] ,function(){
+    return gulp.src("src/injected/js/index.js")
+    .pipe(webpackStreamCurrent("./src/injected/script/webpack.conf.js"))
+    .pipe(gulp.dest("./dist/unpacked/injected/script"));
+})
 
+gulp.task('injected-style', ['clean'] ,function(){
+    return gulp.src('src/injected/style/content.scss')
+            .pipe(sass()) 
+            .pipe(gulp.dest("./dist/unpacked/injected/style"));
 })
 
 gulp.task('copy-top', ['clean'], function(){
@@ -37,4 +43,4 @@ gulp.task('watch', function(){
     return gulp.watch('src/**/*.*', ['default']);
 })
 
-gulp.task('default', ['copy-top','background', 'content', 'watch']);
+gulp.task('default', ['copy-top','background', 'injected-script', "injected-style", 'watch']);
