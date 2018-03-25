@@ -39,8 +39,13 @@ gulp.task('copy-top', ['clean'], function(){
     .pipe(gulp.dest('dist/unpacked'))
 })
 
+gulp.task('copy-popup', ['clean'], function(){
+    gulp.src('src/popup/**.*')
+    .pipe(gulp.dest('dist/unpacked/popup'))
+})
+
 gulp.task('watch', function(){
     return gulp.watch('src/**/*.*', ['default']);
 })
 
-gulp.task('default', ['copy-top','background', 'injected-script', "injected-style", 'watch']);
+gulp.task('default', ['copy-top', 'copy-popup', 'background', 'injected-script', "injected-style", 'watch']);

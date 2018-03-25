@@ -4,8 +4,10 @@
     "description": "A simple chrome extension to remind the user of bedtime",
     "version": "1.0",
     "browser_action": {
-        "default_icon": "bedtime.png"
+        "default_icon": "bedtime.png",
+        "default_popup": "popup/index.html"
     },
+    "permissions": ["storage"],
     "background": {
         "scripts":["background/background.js"]
       },
