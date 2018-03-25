@@ -1,42 +1,45 @@
 (function(){
 
-    let bedtime = "23:00";
-    let active = {
-        sunday: true, 
-        monday: true, 
-        tuesday: true, 
-        wednesday: true, 
-        thursday: true, 
-        friday: false,
-        saturday: false};
-    
+    const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
     const inputs = {
         bedtime: document.getElementById("bedtime"),
-        sunday: document.getElementById("sunday"),
-        monday: document.getElementById("monday"),
-        tuesday: document.getElementById("tuesday"),
-        wednesday: document.getElementById("wednesday"),
-        thursday: document.getElementById("thursday"),
-        friday: document.getElementById("friday"),
-        saturday: document.getElementById("saturday"),
         submit: document.getElementById("bedtime-submit")
     };
-    
-    inputs.bedtime.value=bedtime;
-    for(day in active){
-        inputs[day].checked=active[day];
+    days.forEach(day=>inputs[day]=document.getElementById(day))
+
+    inputs.submit.onclick = submitBedtime;
+
+    getBedtimeData(updateView)
+
+    function updateView(bedtime){
+        inputs.bedtime.value=bedtime.time;
+        days.forEach(day=>inputs[day].checked=bedtime.active[day])
     }
 
-    inputs.submit.onclick = submitBedtime
-
     function submitBedtime(){
-        bedtime = inputs.bedtime.value;
-        let activeDays = [];
-        for(day in active){
-            active[day] = inputs[day].checked;
-            if(active[day]) activeDays.push(day);
-        }
+        let bedtime={
+            time: inputs.bedtime.value,
+            active: {}
+        };
+        days.forEach(day=>bedtime.active[day]=inputs[day].checked);
+        setBedtimeData(bedtime);
+    }
 
-        console.log(`bedtime is ${bedtime} on: ${activeDays}`)
+    function getBedtimeData(callback){
+        chrome.storage.sync.get(['bedtime'], function(result) {
+            bedtime=result.bedtime; 
+            console.log('bedtime from store', bedtime, bedtime && bedtime.time)
+            if(!(bedtime && bedtime.time)){
+                bedtime = {time: undefined, active: {}};
+                days.forEach(day=>bedtime.active[day]=false)
+            }
+            callback(bedtime);
+          });
+    }
+
+    function setBedtimeData(bedtime){
+        console.log('setting to ', bedtime);
+        chrome.storage.sync.set({'bedtime': bedtime});
     }
 })()
