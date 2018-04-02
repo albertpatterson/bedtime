@@ -3,7 +3,7 @@ const runtime = require("./utils/runtime");
 const bedtime = require("./bedtime/bedtime");
 const Bedtime = bedtime.Bedtime;
 
-const BEDTIME_WARNING_ALARM_NAME="bedtimeWarning"
+const BEDTIME_WARNING_ALARM_NAME="bedtimeWarning";
 const BEDTIME_ALARM_NAME="bedtime";
 const DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
@@ -20,7 +20,7 @@ chrome.commands.onCommand.addListener(function(command) {
         let bedtimeData = {
             time: bedtimeStr,
             active: {}
-        }
+        };
         DAYS.forEach(day=>bedtimeData.active[day]=true);
         let bedtime = new Bedtime(bedtimeData);
     }
@@ -28,24 +28,16 @@ chrome.commands.onCommand.addListener(function(command) {
 
 getBedtimeData(function(bedtimeData){
     bedtimeStr = bedtimeData.time;
-    let bedtime = new Bedtime(bedtimeData);
-})
+    if(bedtimeStr){
+      let bedtime = new Bedtime(bedtimeData);
+    }
+});
 
 runtime.addListener(function(message, sender, sendResponse){
     if(message==='query-bedtime'){
         sendResponse({time: bedtimeStr, state: bedtime.state});
     }
-})
-
-
-// chrome.browserAction.onClicked.addListener(function(){
-
-//     // setup bedtime for existing data
-//     getBedtimeData(function(bedtimeData){
-//         let bedtime = new Bedtime(bedtimeData);
-//     })
-
-// })
+});
 
 // setup bedtime for new data
 function getBedtimeData(callback){
@@ -53,7 +45,7 @@ function getBedtimeData(callback){
         let bedtime=result.bedtime; 
         if(!(bedtime && bedtime.time)){
             bedtime = {time: undefined, active: {}};
-            days.forEach(day=>bedtime.active[day]=false);
+            DAYS.forEach(day=>bedtime.active[day]=false);
         }
         callback(bedtime);
       });

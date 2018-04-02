@@ -10,8 +10,9 @@
     "permissions": ["storage", "alarms", "commands"],
     "commands":{
       "test":{
-        "suggested_key":{
-          "default": "Ctrl+Shift+S"
+        "suggested_key": {
+          "default": "Ctrl+Shift+Y",
+          "mac": "MacCtrl+Shift+Y"
         },
         "description":"test the extension"
       }

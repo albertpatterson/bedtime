@@ -1,8 +1,8 @@
-const bedtime = {state: 'none'}
+const bedtime = {state: 'none'};
 const tab = require("../utils/tab");
 const runtime = require("../utils/runtime");
 
-const BEDTIME_WARNING_ALARM_NAME="bedtimeWarning"
+const BEDTIME_WARNING_ALARM_NAME="bedtimeWarning";
 const BEDTIME_ALARM_NAME="bedtime";
 const MILIS_IN_MINUTE = 60*1000;
 const MILIS_IN_HOUR=60*MILIS_IN_MINUTE;
@@ -10,6 +10,8 @@ const MILIS_IN_DAY=24*MILIS_IN_HOUR;
 const BEDTIME_DURATION=MILIS_IN_MINUTE;
 const BEDTIME_WARNINGS_DURATION=MILIS_IN_MINUTE;
 const BEDTIME_WARNINGS_OFFSET=MILIS_IN_MINUTE;
+
+const DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
 let bedtimeCount = 0;
 
@@ -53,6 +55,11 @@ function getMilisTillBedtime(bedtime){
     let milisTillBedtime = (bedtimeParts[0]-d.getHours())*MILIS_IN_HOUR+(bedtimeParts[1]-d.getMinutes())*MILIS_IN_MINUTE;
     milisTillBedtime += milisTillBedtime<0 ? MILIS_IN_DAY : 0;
     return milisTillBedtime;
+}
+
+function isAlarmActiveToday(bedtimeData){
+    let d=new Date(), today=days[d.getDay()];
+    return bedtimeDate.active(today);
 }
 
 function setDailyAlarm(name, when){
