@@ -16,7 +16,7 @@ module.exports = {
     if(getStateCounts().warning===0) this.doStartWarning();
   },
   onTryStopWarning(){
-    if(getStateCounts().warning===1) this.doStartWarning();
+    if(getStateCounts().warning===1) this.doStopWarning();
   },
   onTryStartAlarm(){
     if(getStateCounts().alarm===0) this.doStartAlarm();
