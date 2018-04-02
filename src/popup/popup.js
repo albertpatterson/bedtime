@@ -6,15 +6,15 @@
         bedtime: document.getElementById("bedtime"),
         submit: document.getElementById("bedtime-submit")
     };
-    days.forEach(day=>inputs[day]=document.getElementById(day))
+    days.forEach(day=>inputs[day]=document.getElementById(day));
 
     inputs.submit.onclick = submitBedtime;
 
-    getBedtimeData(updateView)
+    getBedtimeData(updateView);
 
     function updateView(bedtime){
         inputs.bedtime.value=bedtime.time;
-        days.forEach(day=>inputs[day].checked=bedtime.active[day])
+        days.forEach(day=>inputs[day].checked=bedtime.active[day]);
     }
 
     function submitBedtime(){
@@ -29,17 +29,15 @@
     function getBedtimeData(callback){
         chrome.storage.sync.get(['bedtime'], function(result) {
             bedtime=result.bedtime; 
-            console.log('bedtime from store', bedtime, bedtime && bedtime.time)
             if(!(bedtime && bedtime.time)){
                 bedtime = {time: undefined, active: {}};
-                days.forEach(day=>bedtime.active[day]=false)
+                days.forEach(day=>bedtime.active[day]=false);
             }
             callback(bedtime);
           });
     }
 
     function setBedtimeData(bedtime){
-        console.log('setting to ', bedtime);
         chrome.storage.sync.set({'bedtime': bedtime});
     }
 })()

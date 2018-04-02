@@ -29,7 +29,7 @@ gulp.task('injected-script', ['clean'] ,function(){
 })
 
 gulp.task('injected-style', ['clean'] ,function(){
-    return gulp.src('src/injected/style/content.scss')
+    return gulp.src('src/injected/style/bedtimeContent.scss')
             .pipe(sass()) 
             .pipe(gulp.dest("./dist/unpacked/injected/style"));
 })

@@ -1,5 +1,7 @@
-body.bedtime *{
-    display: none;
+body.bedtime {
+    * {
+        display: none;
+    }
     
     #bedtime-notice{
         display: block;

@@ -7,7 +7,14 @@ function _getTabs(queryInfo){
 
 function sendMessage(content, queryInfo){
     return  _getTabs(queryInfo)
-            .then(tabs=>new Promise(res=>chrome.tabs.sendMessage(tabs[0].id, content, res)));
+            .then(tabs=>Promise.all(tabs.map(tab=>sendToTab(tab, content))));
+}
+
+function sendToTab(tab, content){
+    let d=new Date();
+    let hour=d.getHours(), min=d.getMinutes(), t=hour+":"+min;
+    console.log("sent ", content," to ", tab.id, " at "+t);
+    return new Promise(res=>chrome.tabs.sendMessage(tab.id, content, res))
 }
 
 module.exports = {
