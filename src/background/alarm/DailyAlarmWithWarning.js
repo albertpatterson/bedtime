@@ -7,7 +7,7 @@ const ALARM_NAME="Alarm";
 const MILIS_IN_MINUTE = 60*1000;
 const MILIS_IN_HOUR=60*MILIS_IN_MINUTE;
 const MILIS_IN_DAY=24*MILIS_IN_HOUR;
-const Alarm_DURATION=MILIS_IN_MINUTE;
+const ALARM_DURATION=MILIS_IN_MINUTE;
 const WARNING_DURATION=MILIS_IN_MINUTE;
 
 const DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
@@ -23,85 +23,96 @@ function getMilisTillAlarm(Alarm){
 }
 
 function isAlarmActiveToday(alarmData){
-  let d=new Date(), today=days[d.getDay()];
-  return AlarmDate.active(today);
+  let d=new Date(), today=DAYS[d.getDay()];
+  return alarmData.active[today];
 }
 
 function setDailyAlarm(name, milisFromNow){
   return chrome.alarms.create(name, {when: Date.now()+milisFromNow, periodInMinutes: 24*60});
 }
 
-
 module.exports = class DailyAlarmWithWarning{
 
   constructor(alarmData, onStartWarning, onStopWarning, onStartAlarm, onStopAlarm){
     this.alarmData = alarmData;
     this.state = "none";
-    
+
+    this._onStartWarning = onStartWarning;
     this._onStopWarning = onStopWarning;
+    this._onStartAlarm = onStartAlarm;
     this._onStopAlarm = onStopAlarm;
 
     this._warningName = WARNING_NAME + AlarmCount;
     this._stopWarningTO = null;
-    this._setupWarning(onStartWarning, onStopWarning);
+    this._setupWarning();
     
-    this._AlarmName = ALARM_NAME + AlarmCount;
+    this._alarmName = ALARM_NAME + AlarmCount;
     this._stopAlarmTO = null;
-    this._setupAlarmAlarm(onStartAlarm, onStopAlarm);
+    this._setupAlarm();
 
+    chrome.alarms.onAlarm.addListener(this._listenForAlarms.bind(this));
     AlarmCount++;
   }
 
-  _setupWarning(onStartWarning, onStopWarning){
+  timeUntilAlarm(){
+    return getMilisTillAlarm(this.alarmData);
+  }
+
+  _setupWarning(){
     let milisTillAlarm = getMilisTillAlarm(this.alarmData),
-        milisTillWarning = milisTillAlarm-Alarm_WARNINGS_DURATION;
+        milisTillWarning = milisTillAlarm-WARNING_DURATION;
 
-    let stopWarnings = ()=>{
-      onStopWarning();
-      if(this.state==="warning") this.state="none";
-    };
-
-    let tryStartWarningsForDuration = (duration)=>{
-      if(isAlarmActiveToday(this.alarmData)){
-        onStartWarning();
-        this.state="warning";
-        this._stopWarningTO = setTimeout(stopWarnings, duration);
-      }
-    };
-
-    if(milisTillWarning<0){
-      tryStartWarningsForDuration(milisTillAlarm);
+    if(milisTillWarning<=0){
+      this._tryStartWarningForDuration(milisTillAlarm);
       milisTillWarning+=MILIS_IN_DAY;
     }
 
-    let warning = setDailyAlarm(this._warningAlarmName, milisTillWarning);
-    warning.onAlarm(()=>tryStartWarningsForDuration(WARNING_DURATION));
+    setDailyAlarm(this._warningName, milisTillWarning);
   }
 
-  _setupAlarmAlarm(onStartAlarm, onStopAlarm) {
+  _tryStartWarningForDuration(duration){
+    let stopWarnings = ()=>{
+      this._onStopWarning();
+      if(this.state==="warning") this.state="none";
+    };
+
+    if(isAlarmActiveToday(this.alarmData)){
+      this._onStartWarning();
+      this.state="warning";
+      this._stopWarningTO = setTimeout(stopWarnings, duration);
+    }
+  }
+
+  _setupAlarm(onStartAlarm, onStopAlarm) {
     let milisTillAlarm = getMilisTillAlarm(this.alarmData);
+    setDailyAlarm(this._alarmName, milisTillAlarm);
+  }
 
+  _tryStartAlarmForDuration(){
     let stopAlarm = ()=>{
-      onStopAlarm();
+      this._onStopAlarm();
       if(this.state==="alarm") this.state="none";
-
     };
 
-    let tryStartAlarm = ()=>{
-      if(isAlarmActiveToday(this.alarmData)){
-        onStartAlarm();
-        this.state="alarm";
-        this._stopAlarmTO = setTimeout(stopAlarm, Alarm_DURATION);
-      }
-    };
+    if(isAlarmActiveToday(this.alarmData)){
+      this._onStartAlarm();
+      this.state="alarm";
+      this._stopAlarmTO = setTimeout(stopAlarm, ALARM_DURATION);
+    }
+  }
 
-    let alarm = setDailyAlarm(this._AlarmAlarmName, milisTillAlarm);
-    alarm.onAlarm(tryStartAlarm);
+  _listenForAlarms(alarm){
+    if(alarm.name===this._alarmName){
+      this._tryStartAlarmForDuration(WARNING_DURATION);
+    }else if(alarm.name===this._warningName){
+      this._tryStartWarningForDuration(WARNING_DURATION);
+    }
   }
 
   clear(){
+    chrome.alarms.onAlarm.removeListener(this._listenForAlarms);
     chrome.alarms.clear(this._warningName);
-    chrome.alarms.clear(this._AlarmName);
+    chrome.alarms.clear(this._alarmName);
     clearTimeout(this._stopWarningTO);
     clearTimeout(this._stopAlarmTO);
     if(this.state==="warning"){

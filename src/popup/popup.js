@@ -27,8 +27,8 @@
     }
 
     function getBedtimeData(callback){
-        chrome.storage.sync.get(['bedtime'], function(result) {
-            bedtime=result.bedtime; 
+        chrome.storage.sync.get(['bedtimes'], function(result) {
+            bedtime=result.bedtimes[0];
             if(!(bedtime && bedtime.time)){
                 bedtime = {time: undefined, active: {}};
                 days.forEach(day=>bedtime.active[day]=false);
@@ -38,6 +38,7 @@
     }
 
     function setBedtimeData(bedtime){
-        chrome.storage.sync.set({'bedtime': bedtime});
+        chrome.storage.sync.set({'bedtimes': [bedtime]});
+        chrome.runtime.sendMessage("refresh-bedtime");
     }
 })()

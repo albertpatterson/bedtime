@@ -1,15 +1,10 @@
-const tab = require("./utils/tab");
 const runtime = require("./utils/runtime");
-const bedtime = require("./bedtime/bedtime");
-const Bedtime = bedtime.Bedtime;
-
-const BEDTIME_WARNING_ALARM_NAME="bedtimeWarning";
-const BEDTIME_ALARM_NAME="bedtime";
+const bedtimeAlarmsManager = require("./alarm/bedtimeAlarmsManager");
 const DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
 let bedtimeStr = '';
 chrome.commands.onCommand.addListener(function(command) {
-    if(command==="test"){       
+    if(command==="test"){
 
         let d=new Date();
         let hour=d.getHours(), min=d.getMinutes();
@@ -22,34 +17,84 @@ chrome.commands.onCommand.addListener(function(command) {
             active: {}
         };
         DAYS.forEach(day=>bedtimeData.active[day]=true);
-        let bedtime = new Bedtime(bedtimeData);
+        bedtimeAlarmsManager.add(bedtimeData);
     }
 });
 
-getBedtimeData(function(bedtimeData){
-    bedtimeStr = bedtimeData.time;
-    if(bedtimeStr){
-      let bedtime = new Bedtime(bedtimeData);
-    }
-});
+refreshBedtimes();
+
+function refreshBedtimes() {
+  bedtimeAlarmsManager.removeAll();
+
+  // setup bedtime for new data
+  chrome.storage.sync.get(['bedtimes'], function (result) {
+    let bedtimes = result.bedtimes;
+    bedtimes.forEach(bedtimeAlarmsManager.add)
+  });
+}
 
 runtime.addListener(function(message, sender, sendResponse){
     if(message==='query-bedtime'){
-        sendResponse({time: bedtimeStr, state: bedtime.state});
+      sendResponse({time: bedtimeAlarmsManager.getNearestBestTime(), state: bedtimeAlarmsManager.getState()});
+    }else if(message === "refresh-bedtime"){
+      refreshBedtimes()
     }
 });
 
-// setup bedtime for new data
-function getBedtimeData(callback){
-    chrome.storage.sync.get(['bedtime'], function(result) {
-        let bedtime=result.bedtime; 
-        if(!(bedtime && bedtime.time)){
-            bedtime = {time: undefined, active: {}};
-            DAYS.forEach(day=>bedtime.active[day]=false);
-        }
-        callback(bedtime);
-      });
-}
+
+
+// const tab = require("./utils/tab");
+// const runtime = require("./utils/runtime");
+// const bedtime = require("./bedtime/bedtime");
+// const Bedtime = bedtime.Bedtime;
+//
+// const BEDTIME_WARNING_ALARM_NAME="bedtimeWarning";
+// const BEDTIME_ALARM_NAME="bedtime";
+// const DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+//
+// let bedtimeStr = '';
+// chrome.commands.onCommand.addListener(function(command) {
+//     if(command==="test"){
+//
+//         let d=new Date();
+//         let hour=d.getHours(), min=d.getMinutes();
+//         let bedtimeHour = min===59?hour+1:hour;
+//         let bedtimeMin =  min===59?0:min+1;
+//         bedtimeStr = bedtimeHour+":"+bedtimeMin;
+//         console.log("begin test at "+bedtimeStr);
+//         let bedtimeData = {
+//             time: bedtimeStr,
+//             active: {}
+//         };
+//         DAYS.forEach(day=>bedtimeData.active[day]=true);
+//         let bedtime = new Bedtime(bedtimeData);
+//     }
+// });
+//
+// getBedtimeData(function(bedtimeData){
+//     bedtimeStr = bedtimeData.time;
+//     if(bedtimeStr){
+//       let bedtime = new Bedtime(bedtimeData);
+//     }
+// });
+//
+// runtime.addListener(function(message, sender, sendResponse){
+//     if(message==='query-bedtime'){
+//         sendResponse({time: bedtimeStr, state: bedtime.state});
+//     }
+// });
+//
+// // setup bedtime for new data
+// function getBedtimeData(callback){
+//     chrome.storage.sync.get(['bedtime'], function(result) {
+//         let bedtime=result.bedtime;
+//         if(!(bedtime && bedtime.time)){
+//             bedtime = {time: undefined, active: {}};
+//             DAYS.forEach(day=>bedtime.active[day]=false);
+//         }
+//         callback(bedtime);
+//       });
+// }
 
 
 
