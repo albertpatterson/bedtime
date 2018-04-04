@@ -39,10 +39,22 @@ gulp.task('copy-top', ['clean'], function(){
     .pipe(gulp.dest('dist/unpacked'))
 })
 
+// gulp.task('popup-script', ['clean'] ,function(){
+//   return gulp.src("src/popup/script/popup.js")
+//     .pipe(webpackStreamCurrent("./src/popup/script/webpack.conf.js"))
+//     .pipe(gulp.dest("./dist/unpacked/popup/script"));
+// })
+//
+// gulp.task('popup-style', ['popup-script'], function(){
+//   gulp.src('src/popup/style/**.css')
+//     .pipe(gulp.dest('dist/unpacked/popup/style'))
+// })
+
 gulp.task('copy-popup', ['clean'], function(){
-    gulp.src('src/popup/**.*')
+    gulp.src('src/popup/**/*.*')
     .pipe(gulp.dest('dist/unpacked/popup'))
 })
+
 
 gulp.task('watch', function(){
     return gulp.watch('src/**/*.*', ['default']);

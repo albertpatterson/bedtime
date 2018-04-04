@@ -1,0 +1,45 @@
+#bedtime-img{
+    height: 200px;
+    width: 200px;
+}
+.select-cont{
+    display: block;
+    margin-top: 10px
+}
+.bedtime-label{
+    display: block;
+    text-align: center;
+    font-size: 16px;
+}
+.time-select{
+    display: block;
+    margin: 0 auto;
+}
+.day-checkbox-cont{
+    display: inline-block;
+    vertical-align: top
+}
+.day-checkbox-label{
+    display: block;
+    text-align: center;
+}
+.day-checkbox{
+    display: block;
+    text-align: center;
+}
+.days-select{
+    display: inline-block;
+}
+.time-and-day{
+    text-align: center;
+    width: 150px;
+    display: inline-block;
+}
+.delete-cont{
+    width:50px;
+    text-align: center;
+    display: inline-block;
+}
+.delete-button{
+
+}
