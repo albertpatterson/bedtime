@@ -1,33 +1,32 @@
-app = {};
-app.Bedtime = (function(){
+app.BedtimeView = (function(){
 
   var bedtimeCount = 0;
 
   const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
   const bedtimeViewCont = document.getElementById("bedtimeViewCont");
 
-  function addView(id){
+  function addView(id, updateData, removeData){
     // let view = document.createDocumentFragment();
     let view = document.createElement('div');
-    view.id = getID(id, "cont");
-    view.appendChild(createTimeAndDayView(id));
-    view.appendChild(createDeleteView(id));
+    view.id = getId("cont", id);
+    view.appendChild(createTimeAndDayView(id, updateData));
+    view.appendChild(createDeleteView(id, removeData));
     bedtimeViewCont.appendChild(view);
   }
 
-  function createTimeAndDayView(id){
+  function createTimeAndDayView(id, updateData){
     // let view = document.createDocumentFragment();
     let view = document.createElement('div');
     view.className = "time-and-day";
-    view.appendChild(createTimeView(id));
-    view.appendChild(createDaysView(id));
+    view.appendChild(createTimeView(id, updateData));
+    view.appendChild(createDaysView(id, updateData));
     return view
   }
-  function createTimeView(id){
+  function createTimeView(id, updateData){
     let cont = document.createElement('div');
     cont.className = "select-cont";
 
-    let timeId = getID(id, "time");
+    let timeId = getId("time", id);
 
     let label = document.createElement("label");
     cont.appendChild(label);
@@ -40,23 +39,23 @@ app.Bedtime = (function(){
     input.type="time";
     input.className="time-select";
     input.id=timeId;
-    input.onchange = ()=>updateData(id);
+    input.onchange = ()=>getDataAndUpdate(id, updateData);
 
     return cont;
   }
 
-  function createDaysView(id){
+  function createDaysView(id, updateData){
     // let view = document.createDocumentFragment();
     let cont = document.createElement('div');
     cont.className="days-select";
-    cont.id=getID(id, days);
-    days.forEach(day => cont.appendChild(createDayView(id, day)));
+    cont.id=getId('days', id);
+    days.forEach(day => cont.appendChild(createDayView(id, updateData, day)));
     return cont;
   }
 
-  function createDayView(id, day){
+  function createDayView(id, updateData, day){
 
-    let boxId = id+day;
+    let boxId = getId('day',id,day);
 
     let cont = document.createElement('div');
     cont.className="day-checkbox-cont";
@@ -72,12 +71,12 @@ app.Bedtime = (function(){
     checkbox.type="checkbox";
     checkbox.id=boxId;
     checkbox.className="day-checkbox";
-    checkbox.onchange = ()=>updateData(id);
+    checkbox.onchange =  ()=>getDataAndUpdate(id, updateData);
 
     return cont;
   }
 
-  function createDeleteView(id){
+  function createDeleteView(id, removeData){
     let cont = document.createElement('div');
     cont.className='delete-cont';
 
@@ -86,20 +85,30 @@ app.Bedtime = (function(){
     button.className='delete-button';
     button.innerText = 'x';
 
-    button.onclick = ()=>deleteBedtimeView(id);
+    button.onclick = ()=>removeData().then(()=>deleteBedtimeView(id));
 
     return cont;
   }
 
-  function updateBedtimeView(id){
+  function getDataAndUpdate(id, updateData){
+   
+    let time = document.getElementById(getId('time',id)).value;
+    if(time){
+      let active = {};
 
+      app.constants.get("days").map(day=>{
+        let checked = document.getElementById(getId('day', id, day)).checked; 
+        active[day]=checked;
+      });
+      updateData(new app.BedtimeData(time, active));
+    }
   }
 
   function deleteBedtimeView(id){
     bedtimeViewCont.removeChild(document.getElementById("cont"+id))
   }
 
-  function getID(baseId, type){
+  function getId(type, baseId, suffix){
     switch(type) {
       case "cont":
         return "cont"+baseId;
@@ -110,28 +119,27 @@ app.Bedtime = (function(){
       case "days":
         return "days"+baseId;
         break
+      case "day":
+        return "day"+baseId+suffix; 
     }
   }
 
-  return class Bedtime{
-    constructor(bedtime){
-      if(bedtime) this.setBedtime(betime);
+  return class BedtimeView{
+    constructor(data, updateData, removeData){
       this._id="bedtime"+bedtimeCount++;
-      addView(this._id)
+      this._updateData = updateData;
+      this.removeData = removeData;  
+      addView(this._id, updateData, removeData);
+      if(data) updateData(this._id, data);
     }
 
-    setBedtime(bedtime){
-      // update data
+    // updateData(){
+    //   let data = getData(this._id);
+    //   if(data) this._updateData(data);
+    // }
 
-      //update view
-      updateBedtimeView(this.id, bedtime)
-    }
-
-    delete(){
-      // update data
-
-      // update view
-      deleteBedtimeView(this.id)
-    }
+    // delete(){
+    //   this._removeData.then(()=>deleteBedtimeView(this.id));
+    // }
   };
 })();

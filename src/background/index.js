@@ -1,4 +1,6 @@
 const runtime = require("./utils/runtime");
+const storage = require("../data/storage");
+console.log(storage);
 const bedtimeAlarmsManager = require("./alarm/bedtimeAlarmsManager");
 const DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
@@ -29,7 +31,7 @@ function refreshBedtimes() {
   // setup bedtime for new data
   chrome.storage.sync.get(['bedtimes'], function (result) {
     let bedtimes = result.bedtimes;
-    bedtimes.forEach(bedtimeAlarmsManager.add)
+    if(bedtimes) bedtimes.forEach(bedtimeAlarmsManager.add)
   });
 }
 
