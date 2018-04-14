@@ -15,6 +15,7 @@
     function addBedtime(){
         return app.dataManager.add()
         .then(id=>{
+            console.log('adding id ', id)
             app.ids.push(id);
             addView(null, id);
         })
@@ -27,6 +28,7 @@
     function initBedtimes(ids){
         app.viewManager = new app.ViewManager(addBedtime);
         app.ids = ids || [];
+        console.log('ids', app.ids)
         let viewsReady = app.ids.map(id=>{
             return app.dataManager.get(id)
             .then(data=>addView(data, id))
@@ -37,7 +39,9 @@
     app.controller = {
         init: function(){
             app.dataManager.getIds()
-            .then(initBedtimes);
+            .then(rs=>{console.log('init with', rs); 
+                initBedtimes(rs);
+            });
         },
         add: addBedtime
     }

@@ -104,6 +104,15 @@ app.BedtimeView = (function(){
     }
   }
 
+  function updateView(id, data){
+   
+    document.getElementById(getId('time',id)).value = data.time;
+
+    app.constants.get("days").map(day=>{
+      document.getElementById(getId('day', id, day)).checked = data.active[day]; 
+    });
+  }
+
   function deleteBedtimeView(id){
     bedtimeViewCont.removeChild(document.getElementById("cont"+id))
   }
@@ -130,7 +139,7 @@ app.BedtimeView = (function(){
       this._updateData = updateData;
       this.removeData = removeData;  
       addView(this._id, updateData, removeData);
-      if(data) updateData(this._id, data);
+      if(data) updateView(this._id, data);
     }
 
     // updateData(){

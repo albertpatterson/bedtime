@@ -1,13 +1,11 @@
 const DailyAlarmWithWarning = require("./DailyAlarmWithWarning");
 const tab = require("../utils/tab");
 
-const alarms = [];
+const alarms = {};
 
 function getStateCounts(){
   stateCounts = {alarm: 0, warning: 0, none: 0};
-  alarms.forEach((alarm) => {
-    stateCounts[alarm.state]++;
-  });
+  for(id in alarms) stateCounts[alarms[id].state]++;
   return stateCounts;
 }
 
@@ -27,9 +25,13 @@ function tryStopAlarm(){
   if(getStateCounts().alarm===1) tab.sendMessage('end-bedtime', {});
 }
 
+
+
 module.exports = {
-  add: function(alarmData){
-    alarms.push(new DailyAlarmWithWarning(alarmData, tryStartWarning, tryStopWarning, tryStartAlarm, tryStopAlarm));
+  update: function(id, data){
+    if(alarms[id]) alarms[id].clear();
+    alarms[id]=new DailyAlarmWithWarning(data, tryStartWarning, tryStopWarning, tryStartAlarm, tryStopAlarm);
+    console.log('alarms: ', alarms)
   },
   getState(){
     let counts = getStateCounts();
@@ -41,18 +43,23 @@ module.exports = {
       return "none";
     }
   },
-  remove: function(idx){
-    alarms[idx].clear();
-    alarms.splice(idx,1);
-  },
-  removeAll: function(){
-    for(let idx=(alarms.length-1); idx>=0; idx--){
-      this.remove(idx);
+  remove: function(id){
+    if(alarms[id]){
+      alarms[id].clear();
+      delete alarms[id];
+      console.log(alarms);
     }
   },
-  getNearestBestTime(){
-    alarmTimes = alarms.map(a=>a.alarmData.time);
-    timesTillAlarm = alarms.map(a=>a.timeUntilAlarm());
-    return alarmTimes[timesTillAlarm.reduce((minIdx, curIdx)=>timesTillAlarm[curIdx]<timesTillAlarm[minIdx]?curIdx:minIdx, 0)];
+  removeAll: function(){
+    for(id in alarms) this.remove(id);
+  },
+  getNearestBestTime(){    
+    const ids = Object.keys(alarms);
+    const timesTillAlarm = ids.map(id=>alarms[id].timeUntilAlarm());
+    let minIdx = 0;
+    for(let curIdx = 1; curIdx<timesTillAlarm.length; curIdx++){
+      minIdx = timesTillAlarm[curIdx]<timesTillAlarm[minIdx]?curIdx:minIdx;
+    }
+    return alarms[ids[minIdx]].alarmData.time
   }
 };

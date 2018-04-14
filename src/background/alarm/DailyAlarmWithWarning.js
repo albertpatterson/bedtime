@@ -1,34 +1,53 @@
 const Alarm = {state: 'none'};
 const tab = require("../utils/tab");
-const runtime = require("../utils/runtime");
+const runtime = require("../../util/runtime");
+const constants = require("../../util/constants");
 
 const WARNING_NAME="AlarmWarning";
 const ALARM_NAME="Alarm";
-const MILIS_IN_MINUTE = 60*1000;
-const MILIS_IN_HOUR=60*MILIS_IN_MINUTE;
-const MILIS_IN_DAY=24*MILIS_IN_HOUR;
-const ALARM_DURATION=MILIS_IN_MINUTE;
-const WARNING_DURATION=MILIS_IN_MINUTE;
+// const constants.get('milisInMinute') = 60*1000;
+// const constants.get('milisInHour')=60*constants.get('milisInMinute');
+// const constants.get('milisInDay')=24*constants.get('milisInHour');
+// const constants.get('alarmDuration')=constants.get('milisInMinute');
+// const constants.get('warningsDuration')=constants.get('milisInMinute');
 
-const DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+// const constants.get('days') = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
 let AlarmCount = 0;
 
-function getMilisTillAlarm(Alarm){
+function getMilisTillAlarm(alarm){
   let d=new Date();
-  let AlarmParts = Alarm.time.split(":");
-  let milisTillAlarm = (AlarmParts[0]-d.getHours())*MILIS_IN_HOUR+(AlarmParts[1]-d.getMinutes())*MILIS_IN_MINUTE;
-  milisTillAlarm += milisTillAlarm<0 ? MILIS_IN_DAY : 0;
-  return milisTillAlarm;
+  let alarmParts = alarm.time.split(":");
+  let milisTillAlarmToday = (alarmParts[0]-d.getHours())*constants.get('milisInHour')+(alarmParts[1]-d.getMinutes())*constants.get('milisInMinute');
+  
+  let activeDayFound = false;
+  const today = d.getDay();
+  let daysTillAlarm = milisTillAlarmToday>0?0:1;
+  while(!activeDayFound && daysTillAlarm<=7){
+    if(isAlarmActiveOnDay(alarm, (today+daysTillAlarm)%7)){
+      activeDayFound=true;
+    }else{
+      daysTillAlarm++;
+    }
+  }
+
+  if(activeDayFound){
+    return milisTillAlarmToday + daysTillAlarm*constants.get('milisInDay')
+  }else{
+    return Infinity;
+  }
 }
 
-function isAlarmActiveToday(alarmData){
-  let d=new Date(), today=DAYS[d.getDay()];
+function isAlarmActiveOnDay(alarmData, day){
+  day = day || new Date().getDay();
+  let d=new Date(), today=constants.get('days')[day];
   return alarmData.active[today];
 }
 
 function setDailyAlarm(name, milisFromNow){
-  return chrome.alarms.create(name, {when: Date.now()+milisFromNow, periodInMinutes: 24*60});
+  if(Number.isFinite(milisFromNow)){
+    return chrome.alarms.create(name, {when: Date.now()+milisFromNow, periodInMinutes: 24*60});
+  }
 }
 
 module.exports = class DailyAlarmWithWarning{
@@ -60,11 +79,11 @@ module.exports = class DailyAlarmWithWarning{
 
   _setupWarning(){
     let milisTillAlarm = getMilisTillAlarm(this.alarmData),
-        milisTillWarning = milisTillAlarm-WARNING_DURATION;
+        milisTillWarning = milisTillAlarm-constants.get('warningsDuration');
 
     if(milisTillWarning<=0){
       this._tryStartWarningForDuration(milisTillAlarm);
-      milisTillWarning+=MILIS_IN_DAY;
+      milisTillWarning+=constants.get('milisInDay');
     }
 
     setDailyAlarm(this._warningName, milisTillWarning);
@@ -76,7 +95,7 @@ module.exports = class DailyAlarmWithWarning{
       if(this.state==="warning") this.state="none";
     };
 
-    if(isAlarmActiveToday(this.alarmData)){
+    if(isAlarmActiveOnDay(this.alarmData)){
       this._onStartWarning();
       this.state="warning";
       this._stopWarningTO = setTimeout(stopWarnings, duration);
@@ -94,18 +113,18 @@ module.exports = class DailyAlarmWithWarning{
       if(this.state==="alarm") this.state="none";
     };
 
-    if(isAlarmActiveToday(this.alarmData)){
+    if(isAlarmActiveOnDay(this.alarmData)){
       this._onStartAlarm();
       this.state="alarm";
-      this._stopAlarmTO = setTimeout(stopAlarm, ALARM_DURATION);
+      this._stopAlarmTO = setTimeout(stopAlarm, constants.get('alarmDuration'));
     }
   }
 
   _listenForAlarms(alarm){
     if(alarm.name===this._alarmName){
-      this._tryStartAlarmForDuration(WARNING_DURATION);
+      this._tryStartAlarmForDuration(constants.get('warningsDuration'));
     }else if(alarm.name===this._warningName){
-      this._tryStartWarningForDuration(WARNING_DURATION);
+      this._tryStartWarningForDuration(constants.get('warningsDuration'));
     }
   }
 

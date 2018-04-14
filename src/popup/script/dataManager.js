@@ -4,7 +4,7 @@
     const dataResource = app.constants.get("bedtimeDataResource");
 
     function getIds(){
-        return app.runtime.sendMessage(new app.Message(idsResource));
+        return app.runtime.sendMessage(new app.Message(idsResource, null, 'get'));
     }
 
     function get(id){

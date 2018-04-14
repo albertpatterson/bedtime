@@ -1,4 +1,5 @@
-const runtime = require("./utils/runtime");
+const runtime = require("../../util/runtime");
+
 queryBedtime();
 
 const bodyClasses = document.body.classList;
