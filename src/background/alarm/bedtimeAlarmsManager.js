@@ -25,10 +25,9 @@ function tryStopAlarm(){
   if(getStateCounts().alarm===1) tab.sendMessage('end-bedtime', {});
 }
 
-
-
 module.exports = {
   update: function(id, data){
+    // todo: apply logic to avoid clearing the alarm for any update such as the day
     if(alarms[id]) alarms[id].clear();
     alarms[id]=new DailyAlarmWithWarning(data, tryStartWarning, tryStopWarning, tryStartAlarm, tryStopAlarm);
     console.log('alarms: ', alarms)

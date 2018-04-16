@@ -5,13 +5,6 @@ const constants = require("../../util/constants");
 
 const WARNING_NAME="AlarmWarning";
 const ALARM_NAME="Alarm";
-// const constants.get('milisInMinute') = 60*1000;
-// const constants.get('milisInHour')=60*constants.get('milisInMinute');
-// const constants.get('milisInDay')=24*constants.get('milisInHour');
-// const constants.get('alarmDuration')=constants.get('milisInMinute');
-// const constants.get('warningsDuration')=constants.get('milisInMinute');
-
-// const constants.get('days') = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
 let AlarmCount = 0;
 
@@ -20,21 +13,29 @@ function getMilisTillAlarm(alarm){
   let alarmParts = alarm.time.split(":");
   let milisTillAlarmToday = (alarmParts[0]-d.getHours())*constants.get('milisInHour')+(alarmParts[1]-d.getMinutes())*constants.get('milisInMinute');
   
-  let activeDayFound = false;
   const today = d.getDay();
-  let daysTillAlarm = milisTillAlarmToday>0?0:1;
-  while(!activeDayFound && daysTillAlarm<=7){
-    if(isAlarmActiveOnDay(alarm, (today+daysTillAlarm)%7)){
-      activeDayFound=true;
-    }else{
-      daysTillAlarm++;
-    }
-  }
 
-  if(activeDayFound){
-    return milisTillAlarmToday + daysTillAlarm*constants.get('milisInDay')
+  // check if alarm is currently active
+  const milisTillEndAlarmToday = milisTillAlarmToday+constants.get('alarmDuration');
+  if(isAlarmActiveOnDay(alarm, today) && milisTillAlarmToday<0 && milisTillEndAlarmToday>0){
+    return milisTillAlarmToday;
   }else{
-    return Infinity;
+    // find time when it is next active
+    let activeDayFound = false;
+    let daysTillAlarm = milisTillAlarmToday>0?0:1;
+    while(!activeDayFound && daysTillAlarm<=7){
+      if(isAlarmActiveOnDay(alarm, (today+daysTillAlarm)%7)){
+        activeDayFound=true;
+      }else{
+        daysTillAlarm++;
+      }
+    }
+  
+    if(activeDayFound){
+      return milisTillAlarmToday + daysTillAlarm*constants.get('milisInDay')
+    }else{
+      return Infinity;
+    }
   }
 }
 
@@ -81,8 +82,11 @@ module.exports = class DailyAlarmWithWarning{
     let milisTillAlarm = getMilisTillAlarm(this.alarmData),
         milisTillWarning = milisTillAlarm-constants.get('warningsDuration');
 
+    // setup the warning if it is currently active
     if(milisTillWarning<=0){
-      this._tryStartWarningForDuration(milisTillAlarm);
+      if(milisTillAlarm>0){
+        this._tryStartWarningForDuration(milisTillAlarm);
+      }
       milisTillWarning+=constants.get('milisInDay');
     }
 
@@ -103,11 +107,25 @@ module.exports = class DailyAlarmWithWarning{
   }
 
   _setupAlarm(onStartAlarm, onStopAlarm) {
-    let milisTillAlarm = getMilisTillAlarm(this.alarmData);
+
+    let milisTillAlarm = getMilisTillAlarm(this.alarmData),
+        milisTillEndAlarm = milisTillAlarm+constants.get('alarmDuration');
+
+    // setup alarm if it is currently active
+    if(milisTillAlarm<=0){
+      if(milisTillEndAlarm>0){
+        this._tryStartAlarmForDuration(milisTillEndAlarm);
+      }
+      milisTillAlarm+=constants.get('milisInDay');
+    }
+    
     setDailyAlarm(this._alarmName, milisTillAlarm);
   }
 
-  _tryStartAlarmForDuration(){
+  _tryStartAlarmForDuration(duration){
+
+    duration = duration || constants.get('alarmDuration');
+
     let stopAlarm = ()=>{
       this._onStopAlarm();
       if(this.state==="alarm") this.state="none";
@@ -116,7 +134,7 @@ module.exports = class DailyAlarmWithWarning{
     if(isAlarmActiveOnDay(this.alarmData)){
       this._onStartAlarm();
       this.state="alarm";
-      this._stopAlarmTO = setTimeout(stopAlarm, constants.get('alarmDuration'));
+      this._stopAlarmTO = setTimeout(stopAlarm, duration);
     }
   }
 
