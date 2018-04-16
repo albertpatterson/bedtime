@@ -37,12 +37,11 @@ let bedtime = new GetterSetter();
 bedtime.add = function(){
     // let countProm = bedtimeCount ? Promise.resolve(bedtimeCount) : count.get();
     const countProm =  count.get();
-    return countProm.then(cnt=>{
-        bedtimeCount=cnt||-1;
-        bedtimeCount++;
-        let id = getId(bedtimeCount);
+    return countProm.then(curCount=>{
+        let newCount=typeof(curCount)==="undefined" ? 0 : (curCount+1);
+        let id = getId(newCount);
         console.log('generated id ', id);
-        return count.set(bedtimeCount).then(()=>id);
+        return count.set(newCount).then(()=>id);
     })
     // .then((id)=>{
     //     bedtimeCount++;
