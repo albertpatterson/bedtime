@@ -1,28 +1,28 @@
 {
-    "manifest_version": 2,
-    "name": "bedtime",
-    "description": "A simple chrome extension to remind the user of bedtime",
-    "version": "1.0",
-    "browser_action": {
-        "default_icon": "bedtime.png",
-        "default_popup": "popup/index.html"
-    },
-    "permissions": ["storage", "alarms", "commands"],
-    "commands":{
-      "test":{
-        "suggested_key": {
-          "default": "Ctrl+Shift+Y",
-          "mac": "MacCtrl+Shift+Y"
-        },
-        "description":"test the extension"
-      }
-    },
-    "background": {
-        "scripts":["background/background.js"]
+  "manifest_version": 2,
+  "name": "bedtime",
+  "description": "A simple chrome extension to help users get to bed on time by making late night web surfing very difficult and unenjoyable.",
+  "version": "1.0.1",
+  "browser_action": {
+    "default_icon": "bedtime.png",
+    "default_popup": "popup/index.html"
+  },
+  "permissions": ["storage", "alarms", "commands"],
+  "commands":{
+    "test":{
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "MacCtrl+Shift+Y"
       },
-    "content_scripts": [
-      { "matches": ["<all_urls>"],
-        "js": ["injected/script/bedTimeContent.js"],
-        "css": ["injected/style/bedtimeContent.css"]
-      }]
+      "description":"test the extension"
+    }
+  },
+  "background": {
+      "scripts":["background/background.js"]
+    },
+  "content_scripts": [
+    { "matches": ["<all_urls>"],
+      "js": ["injected/script/bedTimeContent.js"],
+      "css": ["injected/style/bedtimeContent.css"]
+    }]
   }
