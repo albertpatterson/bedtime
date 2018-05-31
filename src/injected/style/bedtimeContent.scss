@@ -1,1 +1,14 @@
 @import 'hide-content.scss';
+
+#bedtime-notice{
+ display: none;
+ text-align: center;
+}
+
+#bedtime-message{
+ display: block;
+}
+
+#snooze-button {
+ display:inline;
+}

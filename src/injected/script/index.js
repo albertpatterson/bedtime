@@ -4,7 +4,7 @@ queryBedtime();
 
 const bodyClasses = document.body.classList;
 
-addBedtimeMessage()
+addBedtimeMessage();
 
 runtime.addListener(function(message, sender, sendResponse){
     console.log(message);
@@ -16,12 +16,10 @@ runtime.addListener(function(message, sender, sendResponse){
         queryBedtime()
     }
     sendResponse()
-})
+});
 
 function queryBedtime(){
     chrome.runtime.sendMessage('query-bedtime', function(bedtime){
-        console.log('args', arguments)
-        console.log("onload bedtime state is "+bedtime.state);
         if(bedtime.state==="bedtime-warning"){
             alert('Bedtime is at ' + bedtime.time);
         }else if(bedtime.state==="bedtime"){
@@ -30,11 +28,31 @@ function queryBedtime(){
     })
 }
 
+function snooze(){
+  bodyClasses.remove("bedtime");
+  setTimeout(queryBedtime, 1*60e3);
+}
+
 function addBedtimeMessage(){
-    let m = document.createElement('p');
-    m.id = "bedtime-notice";
-    m.style.fontSize = "30px";
-    m.style.textAlign="center";
-    m.innerText="It's bedtime."
-    document.body.appendChild(m)
+
+    const wrapper = document.createElement("div");
+    wrapper.style.background = "white";
+    wrapper.style.textAlign = "middle";
+    wrapper.id = "bedtime-notice";
+
+
+    const message = document.createElement('p');
+    message.style.fontSize = "30px";
+    message.style.textAlign="center";
+    message.innerText="It's bedtime.";
+    message.id = "bedtime-message";
+    wrapper.appendChild(message);
+
+    let snoozeButton = document.createElement("button");
+    snoozeButton.innerText="Snooze";
+    snoozeButton.onclick = snooze;
+    snoozeButton.id ="snooze-button";
+    wrapper.appendChild(snoozeButton);
+
+    document.body.appendChild(wrapper);
 }

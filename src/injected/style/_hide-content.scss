@@ -4,11 +4,11 @@ body.bedtime {
     }
     
     #bedtime-notice{
-        display: block;
-    }
-}
 
-#bedtime-notice{
-    display: none;
-    text-align: center;
+        display: block;
+
+        //* {
+        //    display: block;
+        //}
+    }
 }
