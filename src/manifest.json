@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "bedtime",
   "description": "A simple chrome extension to help users get to bed on time by making late night web surfing very difficult and unenjoyable.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "browser_action": {
     "default_icon": "bedtime.png",
     "default_popup": "popup/index.html"

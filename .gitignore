@@ -1,6 +1,6 @@
 .idea
 node_modules
-dist/unpacked
+dist
 junk
 package-lock.json
 bedtime.iml

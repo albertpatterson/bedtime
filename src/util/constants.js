@@ -9,7 +9,7 @@
     values.milisInHour=60*values.milisInMinute;
     values.milisInDay=24*values.milisInHour;
     values.alarmDuration=4*values.milisInHour;
-    values.warningsDuration=30*values.milisInMinute;
+    values.warningsDuration=60*values.milisInMinute;
     
     const constants = {
         get: function(name){

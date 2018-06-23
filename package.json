@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "gulp"
+    "build": "gulp",
+    "dev": "gulp dev",
+    "build-prod": "gulp build-prod"
   },
   "repository": {
     "type": "git",
@@ -22,6 +24,7 @@
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-sass": "^3.2.1",
+    "gulp-zip": "^4.1.0",
     "vinyl-source-stream": "^2.0.0",
     "webpack": "^4.2.0",
     "webpack-stream": "^4.0.3"

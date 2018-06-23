@@ -5,6 +5,7 @@ const webpackStream = require('webpack-stream');
 const browserify = require('browserify');
 const source = require('vinyl-source-stream');
 const sass = require('gulp-sass');
+const gzip = require('gulp-zip');
 
 const webpackStreamCurrent = (cPath)=>webpackStream(require(cPath), webpack);
 
@@ -54,4 +55,16 @@ gulp.task('watch', function(){
     return gulp.watch('src/**/*.*', ['default']);
 });
 
-gulp.task('default', ['copy-top', 'copy-popup', 'copy-util', 'background', 'injected-script', "injected-style", 'watch']);
+const defaultTasks = ['copy-top', 'copy-popup', 'copy-util', 'background', 'injected-script', "injected-style"]
+
+gulp.task('default', defaultTasks);
+
+gulp.task('dev', ["default", 'watch']);
+
+gulp.task('zip', defaultTasks, function(){
+    gulp.src(['dist/unpacked/**'])
+    .pipe(gzip('bedtime.zip'))
+    .pipe(gulp.dest('dist'))
+})
+
+gulp.task('build-prod', ['zip'])
