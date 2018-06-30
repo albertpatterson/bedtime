@@ -65,6 +65,6 @@ gulp.task('zip', defaultTasks, function(){
     gulp.src(['dist/unpacked/**'])
     .pipe(gzip('bedtime.zip'))
     .pipe(gulp.dest('dist'))
-})
+});
 
-gulp.task('build-prod', ['zip'])
+gulp.task('build-prod', ['zip']);
