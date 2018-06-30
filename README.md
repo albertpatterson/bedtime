@@ -32,4 +32,4 @@ Install via one of the following:
 * Build the unpacked extension and zip the extension as required for submission to the chrome web store via `npm run build-prod`
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE.md]() file for details
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) file for details
