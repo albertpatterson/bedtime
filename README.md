@@ -1,5 +1,5 @@
 # bedtime
-A chrome extension to prevent users from using the browser after bedtime.
+A chrome extension to prevent users from using the browser after bedtime. Allows users to create an arbitrary number of alarms active on days of the users choosing. When bedtime is near a warning prompting the user to conclude their activity will be shown, and thereafter whenever a window loads the warning is again shown. When bedtime arrives, the content of all pages will be hidden in order to render the browser unusable so that the user is not tempted to stay up past bedtime.
 
 ## Prerequisites
 The Chrome browser: [download](https://www.google.com/chrome)
