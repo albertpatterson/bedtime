@@ -30,7 +30,7 @@ function queryBedtime(){
 
 function snooze(){
   bodyClasses.remove("bedtime");
-  setTimeout(queryBedtime, 1*60e3);
+  setTimeout(queryBedtime, 5*60e3);
 }
 
 function addBedtimeMessage(){

@@ -4,3 +4,4 @@ dist
 junk
 package-lock.json
 bedtime.iml
+.DS_Store
